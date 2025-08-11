@@ -1,0 +1,19 @@
+# Level 0 (Paling Kiri)
+version: '3.8'
+# Level 0 (Paling Kiri)
+services:
+  # Level 1 (Menjorok 2 spasi) - Nama Service
+  db:
+    # Level 2 (Menjorok 4 spasi) - Konfigurasi Service
+    image: mysql:latest
+    container_name: local-mysql-fast-campus
+    ports:
+      # Level 3 (Menjorok 6 spasi) - Item dalam List
+      - "3306:3306"
+    environment:
+      # Level 3 (Menjorok 6 spasi) - Item dalam List
+      - MYSQL_ROOT_PASSWORD=root1234
+      - MYSQL_DATABASE=forum
+    volumes:
+      # Level 3 (Menjorok 6 spasi) - Item dalam List
+      - "C:/Go-Lang/project2/db:/var/lib/mysql"
