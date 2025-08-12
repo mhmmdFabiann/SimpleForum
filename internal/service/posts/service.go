@@ -15,6 +15,7 @@ func NewService(cfg *configs.Config, postRepo postRepository) *service {
 
 type postRepository interface{
 	CreatePost(ctx context.Context, model *posts.PostModel) error
+	CreateComment(ctx context.Context,model *posts.CommentModel) error
 }
 
 type service struct {
