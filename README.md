@@ -15,9 +15,10 @@ SimpleForum API provides the backend services for a forum where users can create
 -   **Comments:**
     -   Add a comment to a post.
     -   View all comments for a specific post.
--   **(Upcoming) Likes:**
+-   **Likes:**
     -   Like/Unlike a post.
-
+-   **(upcoming) Refresh Token**
+    
 ### Built With
 
 -   [Go (Golang)](https://golang.org/)
