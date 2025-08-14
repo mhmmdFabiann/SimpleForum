@@ -44,3 +44,47 @@ func(r *Repository) UpdateUserActivity(ctx context.Context, model *posts.UserAct
 
 	return nil
 }
+
+func (r *Repository) CountLikeByPostID(ctx context.Context, postID int64) (int, error){
+	querry := `select count(id) from user_activities where post_id = ? and is_liked = true`
+
+	var response int
+	row := r.db.QueryRowContext(ctx, querry, postID)
+
+	err:= row.Scan(&response)
+    if err != nil {
+		return response, err
+    }
+    return response, nil
+}
+
+func (r *Repository) GetCommentByPostID(ctx context.Context, postID int64) ([]*posts.Comment, error){
+	querry := `select c.id, c.user_id, c.comment_content, u.username
+	from comments c join users u on c.user_id = u.id
+	where c.post_id = ?`
+
+	rows, err := r.db.QueryContext(ctx, querry, postID)
+	if err != nil{
+		return nil, err
+	}
+	defer rows.Close()
+	response := make([]*posts.Comment, 0)
+
+	for rows.Next(){
+		var(
+			comment posts.Comment
+			username string
+		)
+		err := rows.Scan(&comment.ID, &comment.UserID, &comment.CommentContent, &username)
+		if err != nil{
+			return nil, err
+		}
+		response = append(response, &posts.Comment{
+			ID: comment.ID,
+			UserID: comment.UserID,
+			CommentContent: comment.CommentContent,
+			Username: username,
+		})
+	}
+	return response, nil
+}

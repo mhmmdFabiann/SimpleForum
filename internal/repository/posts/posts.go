@@ -2,6 +2,7 @@ package posts
 
 import (
 	"context"
+	"strings"
 	//"errors"
 	"project2/internal/model/posts"
 )
@@ -15,4 +16,73 @@ func(r *Repository) CreatePost(ctx context.Context, model *posts.PostModel) erro
 	}
 
 	return nil
+}
+
+func(r *Repository) GetAllPost(ctx context.Context, limit, offset int) (*posts.GetAllPostResponse, error){
+	querry:= `select p.id, p.user_id, u.username, p.post_title, p.post_content, p.post_hastags from posts p join users u on p.user_id = u.id limit ? offset ? order by p.updated_at desc`
+
+	response := &posts.GetAllPostResponse{}
+ 
+	rows, err:= r.db.QueryContext(ctx, querry, limit, offset)
+	if err != nil{
+		return response, err
+	}
+	defer rows.Close()
+
+	data := make([]posts.Post, 0)
+
+	for rows.Next(){
+		var(
+			model posts.PostModel
+			username string
+		)
+		err := rows.Scan(&model.ID, model.UserID, username, model.PostContent, model.PostContent, model.PostHastags)
+		if err!=nil{
+			return response, err
+		}
+		data = append(data, posts.Post{
+			ID: model.ID,
+			UserID: model.UserID,
+			Username: username,
+			PostTitle: model.PostTitle,
+			PostContent: model.PostContent,
+			PostHastags: strings.Split(model.PostHastags, ","),
+		})
+	}
+	response.Data = data
+	response.Pagination = posts.Pagination{
+		Limit: limit,
+		Offset: offset,
+	}
+
+	return response, nil
+}
+
+func(r *Repository) GetPostByID(ctx context.Context, id int64) (*posts.Post, error){
+	querry := `select p.id, p.user_id, u.username, p.post_title, p.post_content, p.post_hastags, ua.is_liked
+	from posts p join users u on p.user_id = u.id 
+	join user_activities ua on ua.post_id = p.id
+	where p.id = ? `
+
+	var(
+		model posts.PostModel
+		username string
+		isLiked bool
+	)
+	rows := r.db.QueryRowContext(ctx, querry, id)
+
+	err := rows.Scan(&model.ID, &model.UserID, &username, &model.PostTitle, &model.PostContent, &model.PostHastags, &isLiked)
+	if err != nil{
+		return nil, err
+	}
+
+	return &posts.Post{
+		ID: model.ID,
+		UserID: model.UserID,
+		Username: username,
+		PostTitle: model.PostTitle,
+		PostContent: model.PostContent,
+		PostHastags: strings.Split(model.PostHastags, ","),
+		IsLiked: isLiked,
+	}, nil
 }

@@ -17,10 +17,10 @@ import (
 	postSvc "project2/internal/service/posts"
 )
 
-func main(){
+func main() {
 	r := gin.Default()
 
-	var(
+	var (
 		cfg *configs.Config
 	)
 	err := configs.Init(
@@ -34,15 +34,15 @@ func main(){
 			"yaml",
 		),
 	)
-	
-	if err != nil{
+
+	if err != nil {
 		log.Fatal("gagal inisiasi config", err)
 	}
 	cfg = configs.GetConf()
 	log.Println("config", cfg)
 
 	db, err := internalsql.Connect(cfg.Database.DataSourceName)
-	if err != nil{
+	if err != nil {
 		log.Fatal("error initiating database", err)
 	}
 
@@ -52,7 +52,6 @@ func main(){
 	membershipRepo := membershipRepository.NewRepository(db)
 	membershipService := membershipSvc.NewService(cfg, membershipRepo)
 
-
 	membershipHandler := membership.NewHandler(r, membershipService)
 	membershipHandler.RegisterRoute()
 
@@ -61,7 +60,6 @@ func main(){
 
 	postHandler := post.NewHandler(r, postSvc)
 	postHandler.RegisterRoute()
-
 
 	serverAddress := ":" + cfg.Service.Port
 	r.Run(serverAddress)
