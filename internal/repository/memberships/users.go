@@ -9,24 +9,9 @@ import (
 
 // File: repository/memberships/user.go
 
-func (r *Repository) GetUser(ctx context.Context, email, username string) (*memberships.UserModel, error) {
-    // Mulai query dengan kondisi yang selalu benar
-    query := `SELECT id, email, password, username, created_at, updated_at, created_by, updated_by FROM users WHERE 1=1`
-    // Siapkan slice untuk menampung argumen secara dinamis
-    args := []interface{}{}
-    // Tambahkan kondisi ke query HANYA JIKA parameternya diisi
-    if email != "" {
-        query += " AND email = ?" // Ganti ? dengan $1, $2, dst. jika Anda pakai PostgreSQL
-        args = append(args, email)
-    }
-    if username != "" {
-        query += " AND username = ?"
-        args = append(args, username)
-    }
-    // Pastikan hanya satu hasil yang diambil
-    query += " LIMIT 1"
-    // Jalankan query dengan argumen yang sudah dinamis
-    row := r.db.QueryRowContext(ctx, query, args...)
+func (r *Repository) GetUser(ctx context.Context, email, username string, userID int64) (*memberships.UserModel, error) {
+    querry := `SELECT id, email, password, username, created_at, updated_at, created_by, updated_by FROM users WHERE email = ? AND username = ? OR userID = ?`
+    row := r.db.QueryRowContext(ctx, querry, email, username, userID)
 
     var response memberships.UserModel
     err := row.Scan(&response.ID, &response.Email, &response.Password, &response.Username, &response.CreatedAt, &response.UpdatedAt, &response.CreatedBy, &response.UpdatedBy)

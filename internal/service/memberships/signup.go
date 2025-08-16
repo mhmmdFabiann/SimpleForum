@@ -10,7 +10,7 @@ import (
 )
 
 func (s *service) SingUp(ctx context.Context, req *memberships.SignUpRequest) error{
-	user, err := s.membershipRepo.GetUser(ctx, req.Email, req.Username) // cek apakah email dan username sudah ada di database
+	user, err := s.membershipRepo.GetUser(ctx, req.Email, req.Username, 0) // cek apakah email dan username sudah ada di database
 	if err != nil{
 		return err
 	}

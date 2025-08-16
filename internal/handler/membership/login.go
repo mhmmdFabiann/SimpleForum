@@ -14,14 +14,15 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	accesToken ,err := h.membershipSvc.Login(ctx, request)
+	accesToken, refreshToken ,err := h.membershipSvc.Login(ctx, request)
 	if  err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	response := memberships.LoginResponse{
-		AccesToken: accesToken,
+		AccesToken: accesToken, 
+		RefreshToken: refreshToken,
 	}
 	c.JSON(http.StatusOK, response)
 }
